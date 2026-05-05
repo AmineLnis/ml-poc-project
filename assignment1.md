@@ -1,64 +1,73 @@
-Description du sujet
+# Description du sujet
 
-Le projet consiste à analyser la consommation d’énergie des foyers afin d’identifier des comportements anormaux pouvant correspondre à des fraudes.
+Le projet consiste à construire un modèle de machine learning supervisé de régression permettant de prédire la consommation énergétique d’un foyer.
 
-Le dataset ne contient pas de variable indiquant directement si un client est frauduleux ou non. Il n’est donc pas possible d’utiliser directement un modèle de classification supervisée.
+Le modèle s’appuie sur plusieurs variables décrivant les caractéristiques du foyer et son contexte de consommation, comme la taille du foyer, la température moyenne, la présence de climatisation et la consommation pendant les heures de pointe.
 
-Le projet utilise une approche de machine learning non supervisé pour la détection d’anomalies, combinée à un modèle de régression supervisée pour estimer la consommation normale.
+L’objectif est de comprendre les facteurs qui influencent la consommation énergétique et de prédire la consommation en kWh.
 
-Problématique
+## Problématique
 
-Comment modéliser la consommation énergétique normale des clients afin d’identifier des comportements anormaux pouvant correspondre à des fraudes, tout en limitant les erreurs de détection ?
+Comment prédire la consommation énergétique d’un foyer à partir de ses caractéristiques afin d’identifier les principaux facteurs qui influencent la demande d’énergie ?
 
-Méthodologie
+## Méthodologie
 
 Le projet suit les étapes suivantes :
 
-1. Analyse exploratoire des données pour comprendre les relations entre les variables
+1. Analyse exploratoire des données pour comprendre la structure du dataset et les relations entre les variables.
 
-2. Construction d’un modèle de régression supervisée pour prédire la consommation énergétique à partir des variables disponibles :
+2. Étude des principales variables explicatives :
+   - `Household_Size`
+   - `Avg_Temperature_C`
+   - `Has_AC`
+   - `Peak_Hours_Usage_kWh`
 
-* Household_Size
-* Avg_Temperature_C
-* Has_AC
-* Peak_Hours_Usage_kWh
+3. Feature engineering :
+   - transformation de `Has_AC` en variable numérique avec `Has_AC_Binary`
+   - création de variables d’interaction comme `temperature_x_ac`
+   - création de variables d’interaction comme `household_size_x_ac`
 
-Le modèle utilisé est un Random Forest Regressor
+4. Construction d’un modèle de régression supervisée pour prédire la variable cible :
 
-3. Calcul de l’écart entre la consommation réelle et la consommation prédite
+   `Energy_Consumption_kWh`
 
-4. Détection des anomalies à partir de ces écarts
+5. Évaluation du modèle avec des métriques adaptées à la régression :
+   - MAE
+   - MSE
+   - R²
 
-Un modèle de **Isolation Forest (non supervisé) est utilisé pour identifier les observations atypiques
+## Modèle utilisé
 
-5. Analyse des profils détectés comme anormaux
+Le premier modèle utilisé est une régression linéaire avec standardisation des variables.
 
-Dataset utilisé
+Ce modèle permet d’obtenir une première prédiction simple et interprétable de la consommation énergétique.
+
+Un modèle plus avancé, comme un Random Forest Regressor, peut ensuite être testé pour comparer les performances.
+
+## Dataset utilisé
 
 Le dataset principal contient les variables suivantes :
 
-* Energy_Consumption_kWh
-* Household_Size
-* Avg_Temperature_C
-* Has_AC
-* Peak_Hours_Usage_kWh
-* Date
+- `Household_ID`
+- `Date`
+- `Energy_Consumption_kWh`
+- `Household_Size`
+- `Avg_Temperature_C`
+- `Has_AC`
+- `Peak_Hours_Usage_kWh`
 
-Un second dataset contient des données météo par région :
+La variable cible du projet est :
 
-* température moyenne, minimale et maximale
-* précipitations
-* vitesse du vent
-* nombre de jours froids et chauds
+`Energy_Consumption_kWh`
 
-Ces données permettent d’enrichir l’analyse.
+Il s’agit donc d’un problème de régression supervisée, car on cherche à prédire une valeur numérique continue.
 
-Limites
+## Limites
 
-Le dataset ne contient pas de variable cible indiquant la fraude.
+Le dataset couvre une période courte, du 1er avril 2025 au 8 avril 2025. Il permet donc d’analyser les relations entre les variables sur cette période, mais ne permet pas de conclure sur des tendances longues ou saisonnières.
 
-Les anomalies détectées ne correspondent pas forcément à des fraudes, mais à des comportements inhabituels.
+Le dataset ne contient pas de variable indiquant directement des cas de fraude. Le projet ne porte donc pas sur une détection de fraude confirmée, mais sur la prédiction de la consommation énergétique.
 
-Objectif
+## Objectif
 
-L’objectif est de construire un modèle capable de détecter automatiquement des anomalies dans la consommation énergétique, afin d’identifier des cas potentiels de fraude.
+L’objectif est de construire un modèle capable de prédire la consommation énergétique d’un foyer à partir de ses caractéristiques, puis d’évaluer la qualité des prédictions obtenues.
