@@ -13,15 +13,24 @@ import pandas as pd
 
 
 DATASET_FILE = (
-    Path(__file__).parent.parent / "data" / "household_energy_consumption.csv"
+    Path(__file__).parent.parent / "data" / "household_energy_consumption_enriched.csv"
 )
 TARGET_COLUMN = "Energy_Consumption_kWh"
+HEATING_TYPE_FEATURES = {
+    "Electric": "heating_type_electric",
+    "Gas": "heating_type_gas",
+    "Heat Pump": "heating_type_heat_pump",
+    "District Heating": "heating_type_district_heating",
+}
 FEATURE_COLUMNS = [
     "Household_Size",
     "Avg_Temperature_C",
     "Has_AC_Binary",
+    "surface_m2",
+    "hours_at_home",
     "temperature_x_ac",
     "household_size_x_ac",
+    *HEATING_TYPE_FEATURES.values(),
 ]
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
@@ -50,6 +59,9 @@ def load_dataset_split() -> tuple[Any, Any, Any, Any]:
         "Household_Size",
         "Avg_Temperature_C",
         "Has_AC",
+        "surface_m2",
+        "heating_type",
+        "hours_at_home",
     }
     missing_columns = required_columns.difference(df.columns)
     if missing_columns:
@@ -66,8 +78,20 @@ def load_dataset_split() -> tuple[Any, Any, Any, Any]:
     if df["Has_AC_Binary"].isna().any():
         raise ValueError("Column Has_AC must contain only Yes/No values.")
 
+    df["heating_type"] = df["heating_type"].astype(str).str.strip().str.title()
+    invalid_heating_types = set(df["heating_type"]).difference(HEATING_TYPE_FEATURES)
+    if invalid_heating_types:
+        invalid = ", ".join(sorted(invalid_heating_types))
+        raise ValueError(f"Unsupported heating_type values: {invalid}")
+
+    df["surface_m2"] = pd.to_numeric(df["surface_m2"], errors="coerce")
+    df["hours_at_home"] = pd.to_numeric(df["hours_at_home"], errors="coerce")
+    df = df.dropna(subset=["surface_m2", "hours_at_home"]).copy()
+
     df["temperature_x_ac"] = df["Avg_Temperature_C"] * df["Has_AC_Binary"]
     df["household_size_x_ac"] = df["Household_Size"] * df["Has_AC_Binary"]
+    for heating_type, feature_name in HEATING_TYPE_FEATURES.items():
+        df[feature_name] = df["heating_type"].eq(heating_type).astype(int)
 
     shuffled = df.sample(frac=1, random_state=RANDOM_STATE)
     test_count = max(1, int(len(shuffled) * TEST_SIZE))

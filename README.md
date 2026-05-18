@@ -1,8 +1,14 @@
-# ML Project Template
+# Household Energy Consumption Prediction
 
-This repository is the base template that each student will fork and adapt for the final machine learning proof-of-concept project.
+This project is a supervised machine learning proof of concept for predicting
+household energy consumption in kWh. It uses household profile information,
+weather context, air conditioning, housing surface, heating type, and estimated
+time spent at home to compare regression models and present the results in a
+Streamlit dashboard.
 
-The template already defines the project structure and the main execution workflow. Your job as a student is to plug your own dataset loading logic, trained models, evaluation metrics, and Streamlit presentation into the fixed contracts described below.
+The repository keeps the original student project workflow: dataset loading,
+model evaluation, metrics export, and Streamlit presentation are organized
+around fixed entry points so the experiment can be reproduced locally.
 
 ## Repository Structure
 
@@ -23,6 +29,23 @@ The template already defines the project structure and the main execution workfl
 - `src/app.py`: fixed Streamlit entry point that students must customize
 - `tests/`: optional tests
 - `.env`: environment variables if your project needs them
+
+## Project Dataset
+
+The raw dataset remains available at `data/household_energy_consumption.csv`.
+The project now uses the enriched dataset generated at
+`data/household_energy_consumption_enriched.csv`, which keeps all original
+columns and adds:
+
+- `surface_m2`: generated housing surface, coherent with household size and AC.
+- `heating_type`: generated heating category.
+- `hours_at_home`: generated daily presence at home.
+
+Regenerate the enriched CSV with:
+
+```bash
+python scripts/generate_household_features.py
+```
 
 ## Expected Workflow
 
@@ -236,3 +259,45 @@ You still need to customize `src/app.py` with your project content.
 - Keep the function names and signatures in `src/data.py`, `src/metrics.py`, and `src/app.py` unchanged.
 - Save your trained models before running the template.
 - Use the same evaluation logic for all registered models so the comparison remains fair.
+
+## Data Retrieval Guide
+
+The `data/` directory is ignored by Git, so a fresh clone needs the dataset to
+be restored locally before running the notebooks, training scripts, or app.
+
+1. Download the source dataset from Kaggle:
+
+```text
+https://www.kaggle.com/datasets/samxsam/household-energy-consumption
+```
+
+2. Place the main CSV file in the local `data/` directory with this exact path:
+
+```text
+data/household_energy_consumption.csv
+```
+
+3. Generate the enriched dataset used by the project:
+
+```bash
+python scripts/generate_household_features.py
+```
+
+This creates:
+
+```text
+data/household_energy_consumption_enriched.csv
+```
+
+4. Confirm that the expected local files exist:
+
+```text
+data/household_energy_consumption.csv
+data/household_energy_consumption_enriched.csv
+```
+
+After these files are available, run the full workflow with:
+
+```bash
+python scripts/main.py
+```

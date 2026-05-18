@@ -2,7 +2,7 @@
 
 Le projet consiste à construire un modèle de machine learning supervisé de régression permettant de prédire la consommation énergétique d’un foyer.
 
-Le modèle s’appuie sur plusieurs variables décrivant les caractéristiques du foyer et son contexte de consommation, comme la taille du foyer, la température moyenne, la présence de climatisation et la consommation pendant les heures de pointe.
+Le modèle s’appuie sur plusieurs variables décrivant les caractéristiques du foyer et son contexte de consommation, comme la taille du foyer, la température moyenne, la présence de climatisation, la surface du logement, le type de chauffage, le temps passé à domicile et la consommation pendant les heures de pointe.
 
 L’objectif est de comprendre les facteurs qui influencent la consommation énergétique et de prédire la consommation en kWh.
 
@@ -20,10 +20,14 @@ Le projet suit les étapes suivantes :
    - `Household_Size`
    - `Avg_Temperature_C`
    - `Has_AC`
+   - `surface_m2`
+   - `heating_type`
+   - `hours_at_home`
    - `Peak_Hours_Usage_kWh`
 
 3. Feature engineering :
    - transformation de `Has_AC` en variable numérique avec `Has_AC_Binary`
+   - encodage de `heating_type` en variables indicatrices
    - création de variables d’interaction comme `temperature_x_ac`
    - création de variables d’interaction comme `household_size_x_ac`
 
@@ -55,6 +59,9 @@ Le dataset principal contient les variables suivantes :
 - `Avg_Temperature_C`
 - `Has_AC`
 - `Peak_Hours_Usage_kWh`
+- `surface_m2`
+- `heating_type`
+- `hours_at_home`
 
 La variable cible du projet est :
 

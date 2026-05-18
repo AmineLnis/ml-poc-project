@@ -21,10 +21,12 @@ from sklearn.preprocessing import StandardScaler
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
-DATA_PATH = PROJECT_ROOT / "data" / "household_energy_consumption.csv"
+DATA_PATH = PROJECT_ROOT / "data" / "household_energy_consumption_enriched.csv"
 METRICS_PATH = PROJECT_ROOT / "results" / "model_metrics.csv"
 LEGACY_METRICS_PATH = PROJECT_ROOT / "results" / "test_models_metrics.csv"
 PLOTS_DIR = PROJECT_ROOT / "plots"
+ASSETS_DIR = PROJECT_ROOT / "assets"
+HERO_IMAGE_PATH = ASSETS_DIR / "energy-hero.png"
 TARGET_COLUMN = "Energy_Consumption_kWh"
 RANDOM_STATE = 42
 
@@ -35,14 +37,26 @@ REQUIRED_COLUMNS = [
     "Household_Size",
     "Avg_Temperature_C",
     "Has_AC",
+    "surface_m2",
+    "heating_type",
+    "hours_at_home",
 ]
 
+HEATING_TYPE_FEATURES = {
+    "Electric": "heating_type_electric",
+    "Gas": "heating_type_gas",
+    "Heat Pump": "heating_type_heat_pump",
+    "District Heating": "heating_type_district_heating",
+}
 FEATURE_COLUMNS = [
     "Household_Size",
     "Avg_Temperature_C",
     "Has_AC_Binary",
+    "surface_m2",
+    "hours_at_home",
     "temperature_x_ac",
     "household_size_x_ac",
+    *HEATING_TYPE_FEATURES.values(),
 ]
 
 MODEL_OPTIONS = [
@@ -60,24 +74,24 @@ DEFAULT_MODEL_METRICS = pd.DataFrame(
     [
         {
             "model": "random_forest_optuna",
-            "mae": 1.1098651063244223,
-            "mse": 2.0512860853837047,
-            "rmse": 1.4322311564072696,
-            "r2": 0.9327487963978991,
+            "mae": 1.1099494357228161,
+            "mse": 2.0512257876217674,
+            "rmse": 1.4322101059627277,
+            "r2": 0.9327507732538305,
         },
         {
             "model": "random_forest",
-            "mae": 1.1187209078278832,
-            "mse": 2.0835413547364894,
-            "rmse": 1.443447731903199,
-            "r2": 0.9316913107054151,
+            "mae": 1.1258054594975064,
+            "mse": 2.1085556397798797,
+            "rmse": 1.452086650231273,
+            "r2": 0.9308712199397239,
         },
         {
             "model": "baseline_linear_regression",
-            "mae": 1.1784634224446437,
-            "mse": 2.1790663028722514,
-            "rmse": 1.4761660824149332,
-            "r2": 0.9285595350930648,
+            "mae": 1.1785040720324702,
+            "mse": 2.1799259221809693,
+            "rmse": 1.4764572198953037,
+            "r2": 0.9285313525623282,
         },
     ]
 )
@@ -643,6 +657,587 @@ def inject_css() -> None:
             border-radius: 8px;
             font-weight: 750;
         }
+
+        [data-testid="stSidebar"] {
+            display: block !important;
+            background: #ffffff;
+            border-right: 1px solid #e6ebf2;
+            box-shadow: 18px 0 44px rgba(15, 23, 42, 0.04);
+            width: 266px !important;
+            min-width: 266px !important;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+            padding: 1.25rem 1rem 1rem 1rem;
+        }
+
+        .block-container {
+            max-width: 1340px;
+            padding: 1.15rem 2.4rem 2.2rem 2.3rem;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            padding: 0.15rem 0.4rem 1.25rem 0.4rem;
+            border-bottom: 1px solid #eef2f7;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-brand .brand-mark {
+            width: 46px;
+            height: 46px;
+            border-radius: 9px;
+            flex: 0 0 auto;
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
+        }
+
+        .sidebar-brand .brand-title {
+            font-size: 1rem;
+            font-weight: 850;
+            color: #101b3d;
+        }
+
+        .sidebar-brand .brand-subtitle {
+            color: #52617a;
+            font-size: 0.84rem;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label {
+            position: relative;
+            justify-content: flex-start;
+            min-height: 46px;
+            border-radius: 8px;
+            padding: 0.62rem 0.82rem 0.62rem 3.15rem;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label::before {
+            content: "";
+            position: absolute;
+            left: 0.62rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 31px;
+            height: 31px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: #66748f;
+            background: transparent;
+            font-weight: 900;
+            font-size: 1rem;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(1)::before { content: "⌂"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(2)::before { content: "◨"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(3)::before { content: "▣"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(4)::before { content: "●"; }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+            background: #f7faff;
+            border-color: #eef3fb;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
+            background: linear-gradient(135deg, #eef6ff, #f5f9ff);
+            border-color: #edf3fb;
+            box-shadow: none;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked)::before {
+            color: #1f64f2;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label p {
+            color: #283651;
+            font-size: 0.92rem;
+            font-weight: 760;
+            text-align: left;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p {
+            color: #1f64f2;
+            font-weight: 850;
+        }
+
+        .sidebar-section {
+            color: #66748f;
+            font-size: 0.82rem;
+            font-weight: 650;
+            padding: 0.95rem 0.6rem 0.45rem 0.6rem;
+            border-top: 1px solid #eef2f7;
+            margin-top: 0.85rem;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] {
+            background: transparent;
+            border: 0;
+            padding: 0;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
+            border: 1px dashed #d8e2ef;
+            border-radius: 8px;
+            background: #f8fbff;
+            padding: 0.65rem;
+        }
+
+        .sidebar-about {
+            margin-top: 42vh;
+            border: 1px solid #e5ebf3;
+            border-radius: 8px;
+            color: #3d4a62;
+            padding: 0.82rem 0.95rem;
+            background: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+
+        .app-shell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.45rem;
+        }
+
+        .welcome-kicker {
+            color: #465675;
+            font-size: 0.93rem;
+            margin-bottom: 0.18rem;
+        }
+
+        .welcome-title {
+            margin: 0;
+            color: #101b3d;
+            font-size: 1.55rem;
+            line-height: 1.1;
+            font-weight: 900;
+        }
+
+        .welcome-subtitle {
+            margin: 0.45rem 0 0 0;
+            color: #5b6a84;
+            font-size: 0.96rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .target-card {
+            display: flex;
+            align-items: center;
+            gap: 0.78rem;
+            min-width: 260px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #e4eaf3;
+            border-radius: 8px;
+            padding: 0.72rem 0.95rem;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+        }
+
+        .target-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1.5rem;
+            background: #fff2f2;
+        }
+
+        .target-label,
+        .user-label {
+            color: #6a7891;
+            font-size: 0.8rem;
+            font-weight: 650;
+        }
+
+        .target-name {
+            color: #111b3b;
+            font-size: 0.9rem;
+            font-weight: 850;
+            margin-top: 0.15rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.62rem;
+            color: #1f2c45;
+            font-weight: 780;
+            white-space: nowrap;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #3b82f6, #14b8a6);
+            font-weight: 900;
+        }
+
+        .home-hero {
+            position: relative;
+            min-height: 305px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(340px, 0.82fr);
+            align-items: center;
+            overflow: hidden;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 2.25rem 2.35rem;
+            margin-bottom: 1.25rem;
+            background:
+                radial-gradient(circle at 78% 18%, rgba(84, 211, 226, 0.34), transparent 31%),
+                linear-gradient(118deg, #173a98 0%, #17309a 34%, #126f99 68%, #6d57cc 100%);
+            box-shadow: 0 18px 42px rgba(21, 41, 102, 0.2);
+        }
+
+        .home-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(120deg, transparent 0 30%, rgba(255,255,255,0.08) 30.2%, transparent 30.7% 100%);
+            background-size: 34px 34px, 100% 100%;
+            opacity: 0.42;
+        }
+
+        .home-hero-copy,
+        .home-hero-media {
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-hero-copy {
+            max-width: 690px;
+        }
+
+        .home-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            color: #f4f8ff;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            padding: 0.46rem 0.72rem;
+            font-size: 0.83rem;
+            font-weight: 800;
+            margin-bottom: 1.35rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .home-hero h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(2.2rem, 3.2vw, 3rem);
+            line-height: 1.12;
+            font-weight: 900;
+            max-width: 650px;
+        }
+
+        .home-hero p {
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 1rem;
+            line-height: 1.55;
+            margin: 1.28rem 0 0 0;
+            max-width: 625px;
+        }
+
+        .home-hero-media {
+            min-height: 240px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .home-hero-media img {
+            width: min(100%, 520px);
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 24px 32px rgba(10, 20, 54, 0.24));
+            mix-blend-mode: screen;
+        }
+
+        .home-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.7rem;
+        }
+
+        .home-kpi-card {
+            display: grid;
+            grid-template-columns: 58px minmax(0, 1fr);
+            gap: 1rem;
+            align-items: start;
+            background: #ffffff;
+            border: 1px solid #e3e9f2;
+            border-radius: 8px;
+            min-height: 132px;
+            padding: 1.15rem 1.2rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .home-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+        }
+
+        .home-icon svg {
+            width: 25px;
+            height: 25px;
+            stroke: currentColor;
+            stroke-width: 2.15;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .tone-blue { color: #2563eb; background: #edf4ff; }
+        .tone-green { color: #16a367; background: #ebfbf2; }
+        .tone-amber { color: #f59e0b; background: #fff6e8; }
+        .tone-purple { color: #7c3aed; background: #f3ecff; }
+        .tone-teal { color: #0ea5a8; background: linear-gradient(135deg, #2dd4bf, #0ea5e9); }
+        .tone-rose { color: #ef4444; background: linear-gradient(135deg, #fb6a43, #ef4444); }
+        .tone-violet { color: #6d5dfc; background: linear-gradient(135deg, #4f7df7, #7c3aed); }
+
+        .home-kpi-label {
+            color: #65728b;
+            font-size: 0.86rem;
+            margin-bottom: 0.24rem;
+        }
+
+        .home-kpi-value {
+            color: #111b3b;
+            font-size: 1.52rem;
+            font-weight: 900;
+            line-height: 1.18;
+            margin-bottom: 0.48rem;
+        }
+
+        .home-kpi-hint {
+            color: #5d6b83;
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .home-lower-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.36fr) minmax(360px, 0.96fr);
+            gap: 1.55rem;
+            align-items: start;
+        }
+
+        .home-section-title {
+            color: #111b3b;
+            font-size: 1.22rem;
+            line-height: 1.2;
+            font-weight: 900;
+            margin: 0 0 0.8rem 0;
+        }
+
+        .business-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .business-card {
+            min-height: 151px;
+            background: #ffffff;
+            border: 1px solid #e3e9f2;
+            border-radius: 8px;
+            padding: 1rem 1.05rem;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045);
+        }
+
+        .business-head {
+            display: flex;
+            align-items: center;
+            gap: 0.72rem;
+            margin-bottom: 0.72rem;
+        }
+
+        .business-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4d8df7, #6d5dfc);
+        }
+
+        .business-number.orange {
+            background: linear-gradient(135deg, #ff9b2f, #ff5a1f);
+        }
+
+        .business-title {
+            color: #17213c;
+            font-size: 0.86rem;
+            font-weight: 850;
+        }
+
+        .business-card p,
+        .capability-card p {
+            margin: 0;
+            color: #33415e;
+            font-size: 0.75rem;
+            line-height: 1.55;
+        }
+
+        .question-card {
+            display: grid;
+            grid-template-columns: 56px minmax(0, 1fr);
+            gap: 1rem;
+            align-items: center;
+            color: #111b3b;
+            background:
+                linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(20, 184, 166, 0.55)) border-box;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 1rem 1.15rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.045);
+            margin: 1.05rem 0 0 0;
+        }
+
+        .question-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: #ffffff;
+            background: linear-gradient(135deg, #6d5dfc, #6b3dd8);
+            box-shadow: 0 12px 22px rgba(109, 93, 252, 0.28);
+            font-size: 1.35rem;
+            font-weight: 900;
+        }
+
+        .question-text {
+            color: #111b3b;
+            font-size: 1rem;
+            line-height: 1.45;
+            font-weight: 850;
+        }
+
+        .capability-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .capability-card {
+            min-height: 220px;
+            text-align: center;
+            background: #ffffff;
+            border: 1px solid #e3e9f2;
+            border-radius: 8px;
+            padding: 1.25rem 1rem 1rem 1rem;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045);
+        }
+
+        .capability-card .home-icon {
+            color: #ffffff;
+            margin: 0 auto 1.05rem auto;
+            border-radius: 8px;
+        }
+
+        .capability-title {
+            color: #111b3b;
+            font-size: 0.9rem;
+            font-weight: 900;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer {
+            border-top: 0;
+            color: #66748f;
+            margin-top: 2rem;
+            padding-top: 0;
+        }
+
+        @media (max-width: 1180px) {
+            .home-kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .home-lower-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .block-container {
+                padding: 1rem 1.1rem 2rem 1.1rem;
+            }
+
+            .app-shell-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .home-hero {
+                grid-template-columns: 1fr;
+                padding: 1.65rem;
+            }
+
+            .home-hero-media {
+                min-height: 180px;
+                justify-content: center;
+            }
+
+            .business-cards,
+            .capability-cards,
+            .home-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-about {
+                margin-top: 2rem;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -827,6 +1422,81 @@ def format_number(value: float, digits: int = 0) -> str:
     return f"{value:,.{digits}f}".replace(",", " ")
 
 
+def image_to_data_uri(image_path: Path) -> str:
+    """Return an image file as a base64 data URI."""
+
+    if not image_path.exists():
+        return ""
+    mime_type = "image/jpeg" if image_path.suffix.lower() in {".jpg", ".jpeg"} else "image/png"
+    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+    return f"data:{mime_type};base64,{encoded}"
+
+
+def home_icon(name: str) -> str:
+    """Return a compact inline SVG icon for home-page cards."""
+
+    icons = {
+        "users": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+        """,
+        "user": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        """,
+        "bolt": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/>
+            </svg>
+        """,
+        "home": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m3 11 9-8 9 8"/>
+                <path d="M5 10v11h14V10"/>
+                <path d="M9 21v-7h6v7"/>
+            </svg>
+        """,
+        "database": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <ellipse cx="12" cy="5" rx="8" ry="3"/>
+                <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>
+                <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+            </svg>
+        """,
+        "chart": """
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19V5"/>
+                <path d="M4 19h16"/>
+                <rect x="7" y="11" width="3" height="5" rx="1"/>
+                <rect x="12" y="7" width="3" height="9" rx="1"/>
+                <rect x="17" y="3" width="3" height="13" rx="1"/>
+            </svg>
+        """,
+    }
+    return icons[name]
+
+
+def home_metric_card(icon: str, tone: str, label: str, value: str, hint: str) -> str:
+    """Build a KPI card used by the landing page."""
+
+    return f"""
+        <div class="home-kpi-card">
+            <div class="home-icon {tone}">{home_icon(icon)}</div>
+            <div>
+                <div class="home-kpi-label">{html.escape(label)}</div>
+                <div class="home-kpi-value">{value}</div>
+                <div class="home-kpi-hint">{html.escape(hint)}</div>
+            </div>
+        </div>
+    """
+
+
 @st.cache_data(show_spinner=False)
 def load_default_dataset() -> pd.DataFrame:
     """Load the dataset bundled with the project."""
@@ -870,23 +1540,35 @@ def prepare_features(df: pd.DataFrame) -> pd.DataFrame:
     prepared = df.copy()
     prepared["Date"] = pd.to_datetime(prepared["Date"], errors="coerce")
     prepared["Has_AC"] = prepared["Has_AC"].astype(str).str.strip().str.title()
+    prepared["heating_type"] = prepared["heating_type"].astype(str).str.strip().str.title()
+    prepared["surface_m2"] = pd.to_numeric(prepared["surface_m2"], errors="coerce")
+    prepared["hours_at_home"] = pd.to_numeric(prepared["hours_at_home"], errors="coerce")
     prepared = prepared.dropna(
         subset=[
             TARGET_COLUMN,
             "Household_Size",
             "Avg_Temperature_C",
             "Has_AC",
+            "surface_m2",
+            "heating_type",
+            "hours_at_home",
         ]
     ).copy()
     prepared["Has_AC_Binary"] = prepared["Has_AC"].map({"Yes": 1, "No": 0})
     prepared = prepared.dropna(subset=["Has_AC_Binary"]).copy()
     prepared["Has_AC_Binary"] = prepared["Has_AC_Binary"].astype(int)
+    invalid_heating_types = set(prepared["heating_type"]).difference(HEATING_TYPE_FEATURES)
+    if invalid_heating_types:
+        invalid = ", ".join(sorted(invalid_heating_types))
+        raise ValueError(f"Types de chauffage non supportes : {invalid}")
     prepared["temperature_x_ac"] = (
         prepared["Avg_Temperature_C"] * prepared["Has_AC_Binary"]
     )
     prepared["household_size_x_ac"] = (
         prepared["Household_Size"] * prepared["Has_AC_Binary"]
     )
+    for heating_type, feature_name in HEATING_TYPE_FEATURES.items():
+        prepared[feature_name] = prepared["heating_type"].eq(heating_type).astype(int)
     prepared["consumption_per_person"] = (
         prepared[TARGET_COLUMN] / prepared["Household_Size"].replace(0, np.nan)
     )
@@ -973,113 +1655,134 @@ def train_cached_model(prepared_df: pd.DataFrame, model_name: str) -> dict[str, 
 def render_home(df: pd.DataFrame, prepared_df: pd.DataFrame) -> None:
     """Render the app landing page."""
 
-    st.markdown(
-        """
-        <div class="hero">
-            <span class="eyebrow">Machine Learning supervisé · Régression · Énergie résidentielle</span>
-            <h1>Prédiction de la consommation énergétique des foyers</h1>
-            <p>
-                Aider un fournisseur d'énergie comme EDF à anticiper la demande
-                des foyers, comprendre les pics de consommation et mieux accompagner
-                les clients dans la maîtrise de leur facture.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    hero_image_uri = image_to_data_uri(HERO_IMAGE_PATH)
+    hero_media = (
+        f'<img src="{hero_image_uri}" alt="Maison connectée et tableau de consommation">'
+        if hero_image_uri
+        else ""
+    )
+    kpi_cards = "\n".join(
+        [
+            home_metric_card(
+                "users",
+                "tone-blue",
+                "Observations",
+                format_number(float(len(df))),
+                "Base d'analyse pour comprendre les comportements de consommation.",
+            ),
+            home_metric_card(
+                "user",
+                "tone-green",
+                "Foyers",
+                format_number(float(df["Household_ID"].nunique())),
+                "Clients avec des profils de consommation différents.",
+            ),
+            home_metric_card(
+                "bolt",
+                "tone-amber",
+                "Conso. moyenne",
+                f"{prepared_df[TARGET_COLUMN].mean():.2f} kWh",
+                "Consommation moyenne observée par foyer.",
+            ),
+            home_metric_card(
+                "home",
+                "tone-purple",
+                "Surface moyenne",
+                f"{prepared_df['surface_m2'].mean():.1f} m&sup2;",
+                "Surface de logement générée et ajoutée au dataset enrichi.",
+            ),
+        ]
     )
 
-    col_a, col_b, col_c, col_d = st.columns(4)
-    with col_a:
-        render_metric_card(
-            "Observations",
-            format_number(float(len(df))),
-            "Base d'analyse pour comprendre les comportements de consommation.",
-        )
-    with col_b:
-        render_metric_card(
-            "Foyers",
-            format_number(float(df["Household_ID"].nunique())),
-            "Clients avec des profils de consommation différents.",
-        )
-    with col_c:
-        render_metric_card(
-            "Conso. moyenne",
-            f"{prepared_df[TARGET_COLUMN].mean():.2f} kWh",
-            "Consommation moyenne observée par foyer.",
-        )
-    with col_d:
-        render_metric_card(
-            "Avec climatisation",
-            f"{prepared_df['Has_AC_Binary'].mean() * 100:.1f} %",
-            "Facteur pouvant influencer la consommation lors des périodes chaudes.",
-        )
-
-    st.subheader("Le problème business")
-    col_context, col_problem, col_goal = st.columns(3)
-    with col_context:
-        render_visual_card(
-            "01",
-            "Contexte actuel",
-            "Les prix de l'énergie augmentent, les usages évoluent avec le "
-            "télétravail, les appareils connectés et la climatisation, ce qui "
-            "rend la consommation des foyers plus difficile à prévoir.",
-            "blue",
-        )
-    with col_problem:
-        render_visual_card(
-            "02",
-            "Problème pour EDF",
-            "Tous les foyers ne consomment pas de la même manière. Une famille "
-            "nombreuse, un foyer équipé d'une climatisation ou un client consommant "
-            "fortement en heures de pointe peuvent créer des profils de demande "
-            "très différents.",
-            "orange",
-        )
-    with col_goal:
-        render_visual_card(
-            "03",
-            "Enjeu du projet",
-            "L'objectif est d'estimer la consommation énergétique en kWh afin de "
-            "mieux comprendre les facteurs qui influencent la demande et d'aider "
-            "à anticiper les pics de consommation.",
-            "purple",
-        )
-
-    st.markdown(
-        """
-        <div class="question-card">
-            <div class="label">Question centrale</div>
-            <div class="question">
-                Peut-on prédire la consommation énergétique d'un foyer à partir
-                de ses caractéristiques et de ses habitudes de consommation ?
+    st.html(
+        f"""
+        <div class="home-hero">
+            <div class="home-hero-copy">
+                <div class="home-eyebrow">Machine Learning supervisé · Régression · Énergie résidentielle</div>
+                <h1>Prédiction de la consommation énergétique des foyers</h1>
+                <p>
+                    Aider un fournisseur d'énergie comme EDF à anticiper la demande des foyers,
+                    comprendre les pics de consommation et mieux accompagner les clients dans la
+                    maîtrise de leur facture.
+                </p>
             </div>
+            <div class="home-hero-media">{hero_media}</div>
+        </div>
+
+        <div class="home-kpi-grid">
+            {kpi_cards}
+        </div>
+
+        <div class="home-lower-grid">
+            <section>
+                <h2 class="home-section-title">Le problème business</h2>
+                <div class="business-cards">
+                    <article class="business-card">
+                        <div class="business-head">
+                            <div class="business-number">01</div>
+                            <div class="business-title">Contexte actuel</div>
+                        </div>
+                        <p>
+                            Les prix de l'énergie augmentent, les usages évoluent avec le télétravail,
+                            les appareils connectés et la climatisation, ce qui rend la consommation
+                            des foyers plus difficile à prévoir.
+                        </p>
+                    </article>
+                    <article class="business-card">
+                        <div class="business-head">
+                            <div class="business-number orange">02</div>
+                            <div class="business-title">Problème pour EDF</div>
+                        </div>
+                        <p>
+                            Tous les foyers ne consomment pas de la même manière. Une famille nombreuse,
+                            un logement plus grand, un chauffage différent ou un client présent plus
+                            longtemps à domicile peuvent créer des profils de demande très différents.
+                        </p>
+                    </article>
+                    <article class="business-card">
+                        <div class="business-head">
+                            <div class="business-number">03</div>
+                            <div class="business-title">Enjeu du projet</div>
+                        </div>
+                        <p>
+                            L'objectif est d'estimer la consommation énergétique en kWh afin de mieux
+                            comprendre les facteurs qui influencent la demande et d'aider à anticiper
+                            les pics de consommation.
+                        </p>
+                    </article>
+                </div>
+                <div class="question-card">
+                    <div class="question-badge">?</div>
+                    <div class="question-text">
+                        Peut-on prédire la consommation énergétique d'un foyer à partir de ses
+                        caractéristiques et de ses habitudes de consommation ?
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="home-section-title">Ce que permet l'application</h2>
+                <div class="capability-cards">
+                    <article class="capability-card">
+                        <div class="home-icon tone-teal">{home_icon("database")}</div>
+                        <div class="capability-title">Explorer les données</div>
+                        <p>Comprendre la structure du dataset et les profils de consommation.</p>
+                    </article>
+                    <article class="capability-card">
+                        <div class="home-icon tone-violet">{home_icon("chart")}</div>
+                        <div class="capability-title">Comparer les modèles</div>
+                        <p>Évaluer les performances d'une régression linéaire et d'un Random Forest.</p>
+                    </article>
+                    <article class="capability-card">
+                        <div class="home-icon tone-rose">{home_icon("bolt")}</div>
+                        <div class="capability-title">Faire une prédiction</div>
+                        <p>Estimer la consommation énergétique d'un foyer à partir de ses caractéristiques.</p>
+                    </article>
+                </div>
+            </section>
         </div>
         """,
-        unsafe_allow_html=True,
     )
-
-    st.subheader("Ce que permet l'application")
-    col_explore, col_compare, col_predict = st.columns(3)
-    with col_explore:
-        render_visual_card(
-            "EDA",
-            "Explorer les données",
-            "Comprendre la structure du dataset et les profils de consommation.",
-        )
-    with col_compare:
-        render_visual_card(
-            "ML",
-            "Comparer les modèles",
-            "Évaluer les performances d'une régression linéaire et d'un Random Forest.",
-            "purple",
-        )
-    with col_predict:
-        render_visual_card(
-            "kWh",
-            "Faire une prédiction",
-            "Estimer la consommation énergétique d'un foyer à partir de ses caractéristiques.",
-            "orange",
-        )
 
 
 def render_data_page(df: pd.DataFrame, prepared_df: pd.DataFrame, uploaded_file: Any | None) -> None:
@@ -1127,6 +1830,26 @@ def render_data_page(df: pd.DataFrame, prepared_df: pd.DataFrame, uploaded_file:
             "Détection des lignes répétées.",
         )
 
+    col_surface, col_presence, col_heating = st.columns(3)
+    with col_surface:
+        render_metric_card(
+            "Surface moyenne",
+            f"{prepared_df['surface_m2'].mean():.1f} m2",
+            "Surface générée à partir de la taille du foyer et du profil logement.",
+        )
+    with col_presence:
+        render_metric_card(
+            "Temps à domicile",
+            f"{prepared_df['hours_at_home'].mean():.1f} h",
+            "Présence quotidienne moyenne générée pour le foyer.",
+        )
+    with col_heating:
+        render_metric_card(
+            "Chauffage principal",
+            str(prepared_df["heating_type"].mode().iloc[0]),
+            "Type de chauffage le plus fréquent dans le dataset enrichi.",
+        )
+
     st.markdown(
         """
         <div class="data-preview-card">
@@ -1145,8 +1868,8 @@ def render_data_page(df: pd.DataFrame, prepared_df: pd.DataFrame, uploaded_file:
         """
         <p class='section-note'>
             Les graphiques suivants résument les premières tendances observées dans les données :
-            distribution de la consommation, effet de la taille du foyer, rôle de la climatisation
-            et profils moyens des foyers.
+            distribution de la consommation, effet de la taille du foyer, surface du logement,
+            type de chauffage et profils moyens des foyers.
         </p>
         """,
         unsafe_allow_html=True,
@@ -1163,6 +1886,18 @@ def render_data_page(df: pd.DataFrame, prepared_df: pd.DataFrame, uploaded_file:
         "Ces visualisations montrent que la consommation augmente généralement avec la taille "
         "du foyer et que la présence de climatisation peut modifier le niveau moyen de consommation.",
         PLOTS_DIR / "consommation_taille_climatisation.png",
+    )
+    render_plot_card(
+        "Surface du foyer et consommation",
+        "Ce graphique met en relation la surface du logement et la consommation en kWh, "
+        "avec une lecture par observation et une moyenne par tranche de surface.",
+        PLOTS_DIR / "surface_consommation_energie.png",
+    )
+    render_plot_card(
+        "Energie consommée par type de chauffage",
+        "Cette visualisation compare la distribution et la moyenne de consommation "
+        "selon le chauffage principal du foyer.",
+        PLOTS_DIR / "energie_type_chauffage.png",
     )
     render_plot_card(
         "Profils moyens des foyers",
@@ -1350,18 +2085,29 @@ def make_prediction_row(
     household_size: int,
     avg_temperature: float,
     has_ac: bool,
+    surface_m2: float,
+    heating_type: str,
+    hours_at_home: float,
 ) -> pd.DataFrame:
     """Create a one-row dataframe matching the training features."""
 
     has_ac_binary = int(has_ac)
+    heating_type = heating_type.strip().title()
+    heating_features = {
+        feature_name: int(heating_type == label)
+        for label, feature_name in HEATING_TYPE_FEATURES.items()
+    }
     return pd.DataFrame(
         [
             {
                 "Household_Size": household_size,
                 "Avg_Temperature_C": avg_temperature,
                 "Has_AC_Binary": has_ac_binary,
+                "surface_m2": surface_m2,
+                "hours_at_home": hours_at_home,
                 "temperature_x_ac": avg_temperature * has_ac_binary,
                 "household_size_x_ac": household_size * has_ac_binary,
+                **heating_features,
             }
         ],
         columns=FEATURE_COLUMNS,
@@ -1425,7 +2171,7 @@ def render_prediction_page(prepared_df: pd.DataFrame) -> None:
     )
 
     with st.form("prediction_form"):
-        col_a, col_b = st.columns(2)
+        col_a, col_b, col_c = st.columns(3)
         with col_a:
             household_size = st.slider("Taille du foyer", 1, 8, 4)
             has_ac = st.selectbox("Climatisation", ["Oui", "Non"]) == "Oui"
@@ -1437,6 +2183,27 @@ def render_prediction_page(prepared_df: pd.DataFrame) -> None:
                 float(round(prepared_df["Avg_Temperature_C"].median(), 1)),
                 step=0.1,
             )
+            surface_m2 = st.slider(
+                "Surface du logement (m2)",
+                float(np.floor(prepared_df["surface_m2"].min())),
+                float(np.ceil(prepared_df["surface_m2"].max())),
+                float(round(prepared_df["surface_m2"].median(), 1)),
+                step=1.0,
+            )
+        with col_c:
+            heating_types = list(HEATING_TYPE_FEATURES.keys())
+            heating_type = st.selectbox(
+                "Type de chauffage",
+                heating_types,
+                index=heating_types.index(str(prepared_df["heating_type"].mode().iloc[0])),
+            )
+            hours_at_home = st.slider(
+                "Heures a domicile",
+                float(np.floor(prepared_df["hours_at_home"].min())),
+                float(np.ceil(prepared_df["hours_at_home"].max())),
+                float(round(prepared_df["hours_at_home"].median(), 1)),
+                step=0.5,
+            )
         submitted = st.form_submit_button("Prédire la consommation", type="primary")
 
     if not submitted:
@@ -1447,6 +2214,9 @@ def render_prediction_page(prepared_df: pd.DataFrame) -> None:
         household_size=household_size,
         avg_temperature=avg_temperature,
         has_ac=has_ac,
+        surface_m2=surface_m2,
+        heating_type=heating_type,
+        hours_at_home=hours_at_home,
     )
     model = st.session_state["training_result"]["model"]
     prediction = float(model.predict(input_row)[0])
@@ -1489,41 +2259,68 @@ def render_footer() -> None:
 
 
 def render_top_navigation() -> tuple[str, Any | None]:
-    """Render the premium top navigation and dataset import controls."""
+    """Render the sidebar navigation and dashboard header."""
 
-    st.markdown(
+    st.sidebar.markdown(
         """
-        <div class="top-bar">
-            <div class="top-bar-row">
-                <div class="brand-lockup">
-                    <div class="brand-mark">ML</div>
-                    <div>
-                        <p class="brand-title">Energy ML</p>
-                        <p class="brand-subtitle">Application de régression énergétique</p>
-                    </div>
-                </div>
-                <div class="target-pill">Cible : Energy_Consumption_kWh</div>
+        <div class="sidebar-brand">
+            <div class="brand-mark">ML</div>
+            <div>
+                <p class="brand-title">Energy ML</p>
+                <p class="brand-subtitle">Régression énergétique</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    page = st.radio(
+    page = st.sidebar.radio(
         "Navigation principale",
         NAVIGATION_PAGES,
-        horizontal=True,
         label_visibility="collapsed",
     )
 
-    with st.expander("Importer un CSV personnalisé", expanded=False):
-        uploaded_file = st.file_uploader(
-            "Déposer ou sélectionner un fichier CSV",
-            type=["csv"],
-        )
-        st.caption(
-            "Sans import, l'application utilise automatiquement le dataset du projet."
-        )
+    st.sidebar.markdown(
+        '<div class="sidebar-section">Utilitaires</div>',
+        unsafe_allow_html=True,
+    )
+    uploaded_file = st.sidebar.file_uploader(
+        "Importer un CSV",
+        type=["csv"],
+        help="Sans import, l'application utilise automatiquement le dataset du projet.",
+    )
+    st.sidebar.markdown(
+        '<div class="sidebar-about">? &nbsp; À propos du projet</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="app-shell-header">
+            <div>
+                <div class="welcome-kicker">Bonjour ! &#128075;</div>
+                <h1 class="welcome-title">Bienvenue sur Energy ML</h1>
+                <p class="welcome-subtitle">
+                    Prédisez la consommation énergétique des foyers grâce au Machine Learning.
+                </p>
+            </div>
+            <div class="header-actions">
+                <div class="target-card">
+                    <div class="target-icon">&#127919;</div>
+                    <div>
+                        <div class="target-label">Cible actuelle</div>
+                        <div class="target-name">Energy_Consumption_kWh</div>
+                    </div>
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar">U</div>
+                    <div>Utilisateur⌄</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     return page, uploaded_file
 
@@ -1534,7 +2331,7 @@ def build_app() -> None:
     st.set_page_config(
         page_title="Prédiction énergétique des foyers",
         layout="wide",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state="expanded",
     )
     inject_css()
     page, uploaded_file = render_top_navigation()

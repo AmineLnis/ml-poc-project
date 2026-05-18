@@ -1,6 +1,6 @@
 Description du sujet
 
-Le projet consiste à construire un modèle de machine learning supervisé de régression permettant de prédire la consommation énergétique d’un foyer. Le modèle s’appuie sur plusieurs variables décrivant les caractéristiques du foyer et son contexte de consommation, comme la taille du foyer, la température moyenne, la présence de climatisation et l’usage de l’énergie pendant les heures de pointe.
+Le projet consiste à construire un modèle de machine learning supervisé de régression permettant de prédire la consommation énergétique d’un foyer. Le modèle s’appuie sur plusieurs variables décrivant les caractéristiques du foyer et son contexte de consommation, comme la taille du foyer, la température moyenne, la présence de climatisation, la surface du logement, le type de chauffage, le temps passé à domicile et l’usage de l’énergie pendant les heures de pointe.
 
 L’objectif est de comprendre quels facteurs influencent le plus la consommation énergétique et de produire une prédiction de la consommation en kWh.
 
@@ -10,7 +10,7 @@ Comment prédire la consommation énergétique d’un foyer à partir de ses car
 
 Dataset utilisé
 
-Le dataset utilisé contient des données de consommation énergétique de foyers. Il comprend plusieurs variables explicatives, notamment l’identifiant du foyer, la date, la consommation énergétique en kWh, la taille du foyer, la température moyenne, la présence ou non de climatisation et la consommation pendant les heures de pointe.
+Le dataset utilisé contient des données de consommation énergétique de foyers. Il comprend plusieurs variables explicatives, notamment l’identifiant du foyer, la date, la consommation énergétique en kWh, la taille du foyer, la température moyenne, la présence ou non de climatisation, la consommation pendant les heures de pointe, ainsi que les variables générées `surface_m2`, `heating_type` et `hours_at_home`.
 
 La variable cible du projet est : Energy_Consumption_kWh
 lien du dataset : https://www.kaggle.com/datasets/samxsam/household-energy-consumption

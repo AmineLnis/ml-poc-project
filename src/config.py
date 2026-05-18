@@ -33,17 +33,17 @@ STREAMLIT_PORT = 8501
 MODELS = {
     "baseline_linear_regression": {
         "name": "Régression linéaire",
-        "description": "Modèle baseline entraîné avec les features finales.",
+        "description": "Modèle baseline entraîné avec les features logement enrichies.",
         "path": MODELS_DIR / "baseline_linear_regression.joblib",
     },
     "random_forest": {
         "name": "Random Forest",
-        "description": "Random Forest entraîné avec les features finales.",
+        "description": "Random Forest entraîné avec les features logement enrichies.",
         "path": MODELS_DIR / "random_forest.joblib",
     },
     "random_forest_optuna": {
         "name": "Random Forest optimisé Optuna",
-        "description": "Modèle retenu, entraîné avec les features finales.",
+        "description": "Modèle retenu, entraîné avec les features logement enrichies.",
         "path": MODELS_DIR / "random_forest_optuna.joblib",
     },
 }
