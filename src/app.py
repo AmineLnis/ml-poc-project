@@ -28,6 +28,7 @@ LEGACY_METRICS_PATH = PROJECT_ROOT / "results" / "test_models_metrics.csv"
 PLOTS_DIR = PROJECT_ROOT / "plots"
 ASSETS_DIR = PROJECT_ROOT / "assets"
 HERO_IMAGE_PATH = ASSETS_DIR / "energy-hero.png"
+EDF_LOGO_PATH = SRC_DIR / "logo edf.png"
 LOGO_DATABASE_PATH = SRC_DIR / "logo database.jpg"
 LOGO_MODEL_PATH = SRC_DIR / "logo modele.jpg"
 LOGO_PREDICTION_PATH = SRC_DIR / "logo prediction.png"
@@ -67,7 +68,7 @@ MODEL_OPTIONS = [
     "Random Forest Regressor",
     "Linear Regression",
 ]
-COLORWAY = ["#14B8A6", "#F97316", "#3B82F6", "#A855F7", "#E11D48", "#84CC16"]
+COLORWAY = ["#0F5DB8", "#F05A28", "#19A6A7", "#82B541", "#F6A23C", "#6C83A8"]
 MODEL_NAME_LABELS = {
     "baseline_linear_regression": "Régression linéaire",
     "random_forest": "Random Forest",
@@ -113,21 +114,27 @@ def inject_css() -> None:
         """
         <style>
         :root {
-            --ink: #101828;
-            --muted: #667085;
+            --ink: #10284d;
+            --muted: #65758f;
             --surface: #ffffff;
-            --line: #e4e7ec;
-            --teal: #0f766e;
-            --orange: #ea580c;
-            --blue: #2563eb;
-            --purple: #7c3aed;
-            --rose: #be123c;
-            --green: #65a30d;
+            --line: #dce6f2;
+            --teal: #118e97;
+            --orange: #f05a28;
+            --blue: #0f5db8;
+            --purple: #2f7acb;
+            --rose: #c84431;
+            --green: #1b8d72;
+            --edf-navy: #163b78;
+            --edf-navy-deep: #102a58;
+            --edf-blue-soft: #edf5ff;
+            --edf-orange-soft: #fff0e8;
+            --edf-cyan-soft: #eafafa;
+            --primary-color: #f05a28;
         }
 
         .stApp {
             background:
-                linear-gradient(180deg, #f6fbff 0%, #ffffff 34%, #f8fafc 100%);
+                linear-gradient(180deg, #f3f8ff 0%, #ffffff 34%, #f7fbff 100%);
             color: var(--ink);
         }
 
@@ -168,10 +175,10 @@ def inject_css() -> None:
 
         .top-bar {
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.96)),
-                linear-gradient(90deg, rgba(20, 184, 166, 0.13), rgba(249, 115, 22, 0.13), rgba(124, 58, 237, 0.13));
-            border: 1px solid rgba(226, 232, 240, 0.95);
-            border-top: 6px solid #14B8A6;
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 249, 255, 0.96)),
+                linear-gradient(90deg, rgba(15, 93, 184, 0.12), rgba(240, 90, 40, 0.14), rgba(25, 166, 167, 0.1));
+            border: 1px solid rgba(220, 230, 242, 0.95);
+            border-top: 6px solid var(--orange);
             border-radius: 8px;
             box-shadow: 0 18px 42px rgba(15, 23, 42, 0.11);
             padding: 1.15rem 1.2rem 0.95rem 1.2rem;
@@ -185,7 +192,7 @@ def inject_css() -> None:
             position: absolute;
             inset: 0 0 auto 0;
             height: 6px;
-            background: linear-gradient(90deg, #14B8A6, #F97316, #3B82F6, #A855F7, #E11D48);
+            background: linear-gradient(90deg, var(--edf-navy), var(--blue), var(--orange), var(--teal));
         }
 
         .top-bar-row {
@@ -210,8 +217,8 @@ def inject_css() -> None:
             place-items: center;
             color: white;
             font-weight: 900;
-            background: linear-gradient(135deg, #14B8A6, #2563EB 52%, #A855F7);
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+            background: linear-gradient(135deg, var(--edf-navy), var(--blue) 54%, var(--orange));
+            box-shadow: 0 12px 24px rgba(15, 93, 184, 0.22);
         }
 
         .brand-title {
@@ -229,9 +236,9 @@ def inject_css() -> None:
         }
 
         .target-pill {
-            color: #0f172a;
-            background: #ecfeff;
-            border: 1px solid #bae6fd;
+            color: var(--edf-navy-deep);
+            background: var(--edf-blue-soft);
+            border: 1px solid #cfe2fb;
             border-radius: 999px;
             padding: 0.45rem 0.75rem;
             font-size: 0.84rem;
@@ -274,9 +281,9 @@ def inject_css() -> None:
         }
 
         div[data-testid="stRadio"] label:has(input:checked) {
-            background: linear-gradient(135deg, #0f766e, #2563eb);
+            background: linear-gradient(135deg, var(--edf-navy), var(--blue));
             border-color: transparent;
-            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+            box-shadow: 0 10px 22px rgba(15, 93, 184, 0.22);
         }
 
         div[data-testid="stRadio"] label:has(input:checked) p {
@@ -316,8 +323,8 @@ def inject_css() -> None:
 
         .hero {
             background:
-                linear-gradient(120deg, rgba(15, 23, 42, 0.96), rgba(15, 118, 110, 0.92) 46%, rgba(124, 58, 237, 0.86)),
-                radial-gradient(circle at 78% 12%, rgba(249, 115, 22, 0.45), transparent 30%);
+                linear-gradient(120deg, rgba(16, 42, 88, 0.98), rgba(15, 93, 184, 0.93) 52%, rgba(17, 142, 151, 0.86)),
+                radial-gradient(circle at 78% 12%, rgba(240, 90, 40, 0.46), transparent 30%);
             color: white;
             padding: 2.35rem 2.45rem;
             border-radius: 8px;
@@ -445,16 +452,16 @@ def inject_css() -> None:
             font-weight: 850;
             font-size: 0.78rem;
             margin-bottom: 0.75rem;
-            background: linear-gradient(135deg, #14B8A6, #2563EB);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+            background: linear-gradient(135deg, var(--edf-navy), var(--teal));
+            box-shadow: 0 10px 20px rgba(15, 93, 184, 0.18);
         }
 
         .visual-card.orange .card-icon {
-            background: linear-gradient(135deg, #F97316, #E11D48);
+            background: linear-gradient(135deg, var(--orange), #f6a23c);
         }
 
         .visual-card.purple .card-icon {
-            background: linear-gradient(135deg, #3B82F6, #A855F7);
+            background: linear-gradient(135deg, var(--blue), #56a7e7);
         }
 
         .visual-card strong {
@@ -472,11 +479,11 @@ def inject_css() -> None:
 
         .question-card {
             background:
-                linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(37, 99, 235, 0.93) 52%, rgba(124, 58, 237, 0.9));
+                linear-gradient(135deg, rgba(16, 42, 88, 0.98), rgba(15, 93, 184, 0.94) 56%, rgba(17, 142, 151, 0.88));
             color: #ffffff;
             border-radius: 8px;
             padding: 1.45rem 1.55rem;
-            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 18px 40px rgba(15, 93, 184, 0.2);
             margin: 1.1rem 0 1.25rem 0;
         }
 
@@ -499,11 +506,11 @@ def inject_css() -> None:
         }
 
         .info-banner {
-            background: linear-gradient(135deg, #0f766e, #2563eb);
+            background: linear-gradient(135deg, var(--edf-navy), var(--blue) 62%, var(--teal));
             color: #ffffff;
             border-radius: 8px;
             padding: 0.9rem 1rem;
-            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
+            box-shadow: 0 12px 28px rgba(15, 93, 184, 0.18);
             margin: 0.85rem 0 1rem 0;
             font-weight: 760;
         }
@@ -566,11 +573,11 @@ def inject_css() -> None:
 
         .model-conclusion {
             background:
-                linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(37, 99, 235, 0.94) 52%, rgba(124, 58, 237, 0.92));
+                linear-gradient(135deg, rgba(16, 42, 88, 0.98), rgba(15, 93, 184, 0.94) 56%, rgba(17, 142, 151, 0.9));
             color: #ffffff;
             border-radius: 8px;
             padding: 1.25rem 1.35rem;
-            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 18px 40px rgba(15, 93, 184, 0.2);
             margin: 1rem 0 1.2rem 0;
         }
 
@@ -636,12 +643,12 @@ def inject_css() -> None:
         }
 
         div[data-testid="stAlert"] {
-            background: #dbeafe;
-            border: 1px solid #93c5fd;
-            border-left: 5px solid #2563eb;
+            background: #eaf4ff;
+            border: 1px solid #bfd9fb;
+            border-left: 5px solid var(--blue);
             border-radius: 8px;
             color: #0f172a;
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+            box-shadow: 0 10px 24px rgba(15, 93, 184, 0.08);
         }
 
         div[data-testid="stAlert"] p,
@@ -679,11 +686,25 @@ def inject_css() -> None:
             font-weight: 750;
         }
 
+        div[data-testid="stButton"] > button[kind="primary"],
+        div[data-testid="stFormSubmitButton"] > button[kind="primary"] {
+            background: linear-gradient(135deg, var(--orange), #f47a33);
+            border-color: var(--orange);
+            color: #ffffff;
+            box-shadow: 0 12px 24px rgba(240, 90, 40, 0.22);
+        }
+
+        div[data-testid="stButton"] > button[kind="primary"]:hover,
+        div[data-testid="stFormSubmitButton"] > button[kind="primary"]:hover {
+            background: linear-gradient(135deg, #dd4c20, var(--orange));
+            border-color: #dd4c20;
+        }
+
         [data-testid="stSidebar"] {
             display: block !important;
             background:
-                linear-gradient(180deg, #ffffff 0%, #f8fbff 46%, #ffffff 100%);
-            border-right: 1px solid #dfe7f2;
+                linear-gradient(180deg, #ffffff 0%, #f3f8ff 44%, #ffffff 100%);
+            border-right: 1px solid #d7e3f2;
             box-shadow: 18px 0 46px rgba(17, 24, 39, 0.06);
             width: 286px !important;
             min-width: 286px !important;
@@ -700,11 +721,33 @@ def inject_css() -> None:
 
         .sidebar-brand {
             display: flex;
-            gap: 0.82rem;
+            gap: 0.88rem;
             align-items: center;
             padding: 0.74rem 0.72rem 1.15rem 0.72rem;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+            border-bottom: 1px solid rgba(215, 227, 242, 0.96);
             margin-bottom: 1.15rem;
+        }
+
+        .sidebar-edf-logo {
+            width: 62px;
+            height: 58px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(237, 245, 255, 0.92));
+            border: 1px solid #d9e6f6;
+            box-shadow:
+                0 18px 34px rgba(15, 93, 184, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        .sidebar-edf-logo img {
+            width: 50px;
+            height: auto;
+            display: block;
+            filter: brightness(1.24) saturate(1.08);
         }
 
         .sidebar-brand .brand-mark {
@@ -712,9 +755,9 @@ def inject_css() -> None:
             height: 48px;
             border-radius: 14px;
             flex: 0 0 auto;
-            background: linear-gradient(135deg, #14b8a6 0%, #2563eb 58%, #7c3aed 100%);
+            background: linear-gradient(135deg, var(--edf-navy) 0%, var(--blue) 62%, var(--orange) 100%);
             box-shadow:
-                0 18px 34px rgba(37, 99, 235, 0.24),
+                0 18px 34px rgba(15, 93, 184, 0.24),
                 inset 0 1px 0 rgba(255, 255, 255, 0.38);
             font-size: 1rem;
             letter-spacing: 0;
@@ -726,6 +769,16 @@ def inject_css() -> None:
             line-height: 1.1;
             font-weight: 900;
             color: #101b3d;
+        }
+
+        .sidebar-brand-kicker {
+            margin: 0 0 0.2rem 0;
+            color: var(--orange);
+            font-size: 0.68rem;
+            font-weight: 950;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            text-transform: uppercase;
         }
 
         .sidebar-brand .brand-subtitle {
@@ -798,18 +851,18 @@ def inject_css() -> None:
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
-            background: linear-gradient(135deg, #ffffff 0%, #eef6ff 100%);
-            border-color: #dde9fb;
+            background: linear-gradient(135deg, #ffffff 0%, var(--edf-blue-soft) 100%);
+            border-color: #d1e1f7;
             box-shadow:
-                0 14px 30px rgba(37, 99, 235, 0.11),
-                inset 3px 0 0 #2563eb;
+                0 14px 30px rgba(15, 93, 184, 0.12),
+                inset 3px 0 0 var(--orange);
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked)::before {
             color: #ffffff;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            background: linear-gradient(135deg, var(--edf-navy), var(--blue));
             border-color: transparent;
-            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.26);
+            box-shadow: 0 10px 22px rgba(15, 93, 184, 0.26);
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label p {
@@ -821,7 +874,7 @@ def inject_css() -> None:
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p {
-            color: #1d4ed8;
+            color: var(--edf-navy);
             font-weight: 900;
         }
 
@@ -878,12 +931,12 @@ def inject_css() -> None:
             align-items: center;
             justify-content: center;
             border-radius: 10px;
-            background: #111827;
-            border: 1px solid #111827;
+            background: var(--edf-navy);
+            border: 1px solid var(--edf-navy);
             color: transparent !important;
             font-size: 0 !important;
             font-weight: 800;
-            box-shadow: 0 10px 20px rgba(17, 24, 39, 0.16);
+            box-shadow: 0 10px 20px rgba(16, 42, 88, 0.18);
             min-height: 42px;
             padding: 0.58rem 0.72rem;
             position: relative;
@@ -900,8 +953,8 @@ def inject_css() -> None:
         }
 
         [data-testid="stSidebar"] [data-testid="stFileUploader"] button:hover {
-            background: #2563eb;
-            border-color: #2563eb;
+            background: var(--orange);
+            border-color: var(--orange);
             color: #ffffff;
         }
 
@@ -917,9 +970,10 @@ def inject_css() -> None:
             padding: 2.25rem 2.35rem;
             margin-bottom: 1.25rem;
             background:
-                radial-gradient(circle at 78% 18%, rgba(84, 211, 226, 0.34), transparent 31%),
-                linear-gradient(118deg, #173a98 0%, #17309a 34%, #126f99 68%, #6d57cc 100%);
-            box-shadow: 0 18px 42px rgba(21, 41, 102, 0.2);
+                radial-gradient(circle at 80% 16%, rgba(240, 90, 40, 0.4), transparent 28%),
+                radial-gradient(circle at 68% 80%, rgba(25, 166, 167, 0.2), transparent 34%),
+                linear-gradient(118deg, #102a58 0%, #163b78 36%, #0f5db8 72%, #118e97 100%);
+            box-shadow: 0 18px 42px rgba(16, 42, 88, 0.24);
         }
 
         .home-hero::before {
@@ -943,6 +997,14 @@ def inject_css() -> None:
             max-width: 690px;
         }
 
+        .home-hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.35rem;
+        }
+
         .home-eyebrow {
             display: inline-flex;
             align-items: center;
@@ -953,8 +1015,39 @@ def inject_css() -> None:
             padding: 0.46rem 0.72rem;
             font-size: 0.83rem;
             font-weight: 800;
-            margin-bottom: 1.35rem;
+            margin-bottom: 0;
             backdrop-filter: blur(8px);
+        }
+
+        .home-edf-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.58rem;
+            min-height: 40px;
+            padding: 0.35rem 0.48rem 0.35rem 0.72rem;
+            border-radius: 999px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 28px rgba(16, 42, 88, 0.18);
+            backdrop-filter: blur(10px);
+        }
+
+        .home-edf-badge span {
+            font-size: 0.78rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .home-edf-badge img {
+            width: 47px;
+            height: 30px;
+            object-fit: contain;
+            display: block;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 999px;
+            padding: 0.14rem 0.32rem;
+            filter: brightness(1.24) saturate(1.08);
         }
 
         .home-hero h1 {
@@ -1027,13 +1120,13 @@ def inject_css() -> None:
             stroke-linejoin: round;
         }
 
-        .tone-blue { color: #2563eb; background: #edf4ff; }
-        .tone-green { color: #16a367; background: #ebfbf2; }
-        .tone-amber { color: #f59e0b; background: #fff6e8; }
-        .tone-purple { color: #7c3aed; background: #f3ecff; }
-        .tone-teal { color: #0ea5a8; background: linear-gradient(135deg, #2dd4bf, #0ea5e9); }
-        .tone-rose { color: #ef4444; background: linear-gradient(135deg, #fb6a43, #ef4444); }
-        .tone-violet { color: #6d5dfc; background: linear-gradient(135deg, #4f7df7, #7c3aed); }
+        .tone-blue { color: var(--blue); background: var(--edf-blue-soft); }
+        .tone-green { color: var(--green); background: #eaf8f1; }
+        .tone-amber { color: var(--orange); background: var(--edf-orange-soft); }
+        .tone-purple { color: #3777ba; background: #eaf3fc; }
+        .tone-teal { color: #ffffff; background: linear-gradient(135deg, var(--teal), var(--blue)); }
+        .tone-rose { color: #ffffff; background: linear-gradient(135deg, var(--orange), #f6a23c); }
+        .tone-violet { color: #ffffff; background: linear-gradient(135deg, var(--edf-navy), var(--blue)); }
 
         .home-kpi-label {
             color: #65728b;
@@ -1101,11 +1194,11 @@ def inject_css() -> None:
             color: #ffffff;
             font-size: 0.78rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #4d8df7, #6d5dfc);
+            background: linear-gradient(135deg, var(--edf-navy), var(--blue));
         }
 
         .business-number.orange {
-            background: linear-gradient(135deg, #ff9b2f, #ff5a1f);
+            background: linear-gradient(135deg, #f6a23c, var(--orange));
         }
 
         .business-title {
@@ -1149,7 +1242,7 @@ def inject_css() -> None:
             color: #ffffff;
             margin: 0;
             border-radius: 12px;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+            box-shadow: 0 12px 24px rgba(15, 93, 184, 0.16);
         }
 
         .capability-logo {
@@ -1685,9 +1778,20 @@ def render_home(df: pd.DataFrame, prepared_df: pd.DataFrame) -> None:
     """Render the app landing page."""
 
     hero_image_uri = image_to_data_uri(HERO_IMAGE_PATH)
+    edf_logo_uri = image_to_data_uri(EDF_LOGO_PATH)
     hero_media = (
         f'<img src="{hero_image_uri}" alt="Maison connectée et tableau de consommation">'
         if hero_image_uri
+        else ""
+    )
+    edf_home_badge = (
+        f"""
+        <div class="home-edf-badge">
+            <span>Cas d'usage énergie</span>
+            <img src="{edf_logo_uri}" alt="Logo EDF">
+        </div>
+        """
+        if edf_logo_uri
         else ""
     )
     database_logo = capability_logo(
@@ -1745,7 +1849,10 @@ def render_home(df: pd.DataFrame, prepared_df: pd.DataFrame) -> None:
         f"""
         <div class="home-hero">
             <div class="home-hero-copy">
-                <div class="home-eyebrow">Machine Learning supervisé · Régression · Énergie résidentielle</div>
+                <div class="home-hero-meta">
+                    <div class="home-eyebrow">Machine Learning supervisé · Régression · Énergie résidentielle</div>
+                    {edf_home_badge}
+                </div>
                 <h1>Prédiction de la consommation énergétique des foyers</h1>
                 <p>
                     Aider un fournisseur d'énergie comme EDF à anticiper la demande des foyers,
@@ -2059,7 +2166,7 @@ def render_model_page(prepared_df: pd.DataFrame) -> None:
             x="Reel",
             y="Prediction",
             opacity=0.58,
-            color_discrete_sequence=["#14B8A6"],
+            color_discrete_sequence=["#0F5DB8"],
             title="Prédictions vs valeurs réelles",
             labels={"Reel": "Valeur réelle (kWh)", "Prediction": "Prédiction (kWh)"},
         )
@@ -2071,10 +2178,10 @@ def render_model_page(prepared_df: pd.DataFrame) -> None:
             y0=min_value,
             x1=max_value,
             y1=max_value,
-            line=dict(color="#F97316", width=2),
+            line=dict(color="#F05A28", width=2),
         )
         fig = apply_plot_style(fig, 400)
-        fig.update_traces(marker=dict(color="#14B8A6", opacity=0.72))
+        fig.update_traces(marker=dict(color="#0F5DB8", opacity=0.72))
         st.plotly_chart(
             fig,
             use_container_width=True,
@@ -2085,7 +2192,7 @@ def render_model_page(prepared_df: pd.DataFrame) -> None:
             prediction_df,
             x="Erreur",
             nbins=50,
-            color_discrete_sequence=["#7C3AED"],
+            color_discrete_sequence=["#19A6A7"],
             title="Distribution des erreurs résiduelles",
             labels={"Erreur": "Erreur réelle - prédiction (kWh)"},
         )
@@ -2103,14 +2210,22 @@ def render_model_page(prepared_df: pd.DataFrame) -> None:
                 "Variable": FEATURE_COLUMNS,
                 "Importance": estimator.feature_importances_,
             }
-        ).sort_values("Importance", ascending=True)
+        )
+        importance_df["Variable"] = importance_df["Variable"].replace(
+            {feature_name: "heating_type" for feature_name in HEATING_TYPE_FEATURES.values()}
+        )
+        importance_df = (
+            importance_df.groupby("Variable", as_index=False)["Importance"]
+            .sum()
+            .sort_values("Importance", ascending=True)
+        )
         fig = px.bar(
             importance_df,
             x="Importance",
             y="Variable",
             orientation="h",
             color="Importance",
-            color_continuous_scale="Viridis",
+            color_continuous_scale=["#e5f1ff", "#0f5db8", "#f05a28"],
             title="Importance des variables du modèle",
         )
         fig = apply_plot_style(fig, 430)
@@ -2166,13 +2281,13 @@ def render_prediction_gauge(prediction: float, prepared_df: pd.DataFrame) -> Non
             number={"suffix": " kWh"},
             gauge={
                 "axis": {"range": [min_value, max_value]},
-                "bar": {"color": "#14B8A6"},
+                "bar": {"color": "#0F5DB8"},
                 "steps": [
-                    {"range": [min_value, mean_value], "color": "#dcfce7"},
-                    {"range": [mean_value, max_value], "color": "#fee2e2"},
+                    {"range": [min_value, mean_value], "color": "#e8f8f1"},
+                    {"range": [mean_value, max_value], "color": "#fff0e8"},
                 ],
                 "threshold": {
-                    "line": {"color": "#F97316", "width": 3},
+                    "line": {"color": "#F05A28", "width": 3},
                     "thickness": 0.72,
                     "value": mean_value,
                 },
@@ -2309,11 +2424,18 @@ def render_footer() -> None:
 def render_top_navigation() -> tuple[str, Any | None]:
     """Render the sidebar navigation and dashboard header."""
 
+    edf_logo_uri = image_to_data_uri(EDF_LOGO_PATH)
+    edf_sidebar_logo = (
+        f'<div class="sidebar-edf-logo"><img src="{edf_logo_uri}" alt="Logo EDF"></div>'
+        if edf_logo_uri
+        else '<div class="brand-mark">ML</div>'
+    )
     st.sidebar.markdown(
-        """
+        f"""
         <div class="sidebar-brand">
-            <div class="brand-mark">ML</div>
+            {edf_sidebar_logo}
             <div>
+                <p class="sidebar-brand-kicker">Projet énergie</p>
                 <p class="brand-title">Energy ML</p>
                 <p class="brand-subtitle">Régression énergétique</p>
             </div>
