@@ -29,7 +29,6 @@ FEATURE_COLUMNS = [
     "surface_m2",
     "hours_at_home",
     "temperature_x_ac",
-    "household_size_x_ac",
     *HEATING_TYPE_FEATURES.values(),
 ]
 TEST_SIZE = 0.2
@@ -89,7 +88,6 @@ def load_dataset_split() -> tuple[Any, Any, Any, Any]:
     df = df.dropna(subset=["surface_m2", "hours_at_home"]).copy()
 
     df["temperature_x_ac"] = df["Avg_Temperature_C"] * df["Has_AC_Binary"]
-    df["household_size_x_ac"] = df["Household_Size"] * df["Has_AC_Binary"]
     for heating_type, feature_name in HEATING_TYPE_FEATURES.items():
         df[feature_name] = df["heating_type"].eq(heating_type).astype(int)
 

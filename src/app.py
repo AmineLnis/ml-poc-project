@@ -20,13 +20,17 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
-PROJECT_ROOT = Path(__file__).parent.parent
+SRC_DIR = Path(__file__).parent
+PROJECT_ROOT = SRC_DIR.parent
 DATA_PATH = PROJECT_ROOT / "data" / "household_energy_consumption_enriched.csv"
 METRICS_PATH = PROJECT_ROOT / "results" / "model_metrics.csv"
 LEGACY_METRICS_PATH = PROJECT_ROOT / "results" / "test_models_metrics.csv"
 PLOTS_DIR = PROJECT_ROOT / "plots"
 ASSETS_DIR = PROJECT_ROOT / "assets"
 HERO_IMAGE_PATH = ASSETS_DIR / "energy-hero.png"
+LOGO_DATABASE_PATH = SRC_DIR / "logo database.jpg"
+LOGO_MODEL_PATH = SRC_DIR / "logo modele.jpg"
+LOGO_PREDICTION_PATH = SRC_DIR / "logo prediction.png"
 TARGET_COLUMN = "Energy_Consumption_kWh"
 RANDOM_STATE = 42
 
@@ -55,7 +59,6 @@ FEATURE_COLUMNS = [
     "surface_m2",
     "hours_at_home",
     "temperature_x_ac",
-    "household_size_x_ac",
     *HEATING_TYPE_FEATURES.values(),
 ]
 
@@ -359,6 +362,24 @@ def inject_css() -> None:
             min-height: 116px;
         }
 
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 1rem;
+            margin: 1rem 0 1.35rem 0;
+        }
+
+        .metric-grid .metric-card {
+            grid-column: span 3;
+            min-height: 150px;
+        }
+
+        .metric-grid .metric-card:nth-child(5),
+        .metric-grid .metric-card:nth-child(6),
+        .metric-grid .metric-card:nth-child(7) {
+            grid-column: span 4;
+        }
+
         .metric-card .label {
             color: var(--muted);
             font-size: 0.86rem;
@@ -660,15 +681,16 @@ def inject_css() -> None:
 
         [data-testid="stSidebar"] {
             display: block !important;
-            background: #ffffff;
-            border-right: 1px solid #e6ebf2;
-            box-shadow: 18px 0 44px rgba(15, 23, 42, 0.04);
-            width: 266px !important;
-            min-width: 266px !important;
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f8fbff 46%, #ffffff 100%);
+            border-right: 1px solid #dfe7f2;
+            box-shadow: 18px 0 46px rgba(17, 24, 39, 0.06);
+            width: 286px !important;
+            min-width: 286px !important;
         }
 
         [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
-            padding: 1.25rem 1rem 1rem 1rem;
+            padding: 1.35rem 1.05rem 1.1rem 1.05rem;
         }
 
         .block-container {
@@ -678,30 +700,40 @@ def inject_css() -> None:
 
         .sidebar-brand {
             display: flex;
-            gap: 0.8rem;
+            gap: 0.82rem;
             align-items: center;
-            padding: 0.15rem 0.4rem 1.25rem 0.4rem;
-            border-bottom: 1px solid #eef2f7;
-            margin-bottom: 1rem;
+            padding: 0.74rem 0.72rem 1.15rem 0.72rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+            margin-bottom: 1.15rem;
         }
 
         .sidebar-brand .brand-mark {
-            width: 46px;
-            height: 46px;
-            border-radius: 9px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             flex: 0 0 auto;
-            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
+            background: linear-gradient(135deg, #14b8a6 0%, #2563eb 58%, #7c3aed 100%);
+            box-shadow:
+                0 18px 34px rgba(37, 99, 235, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.38);
+            font-size: 1rem;
+            letter-spacing: 0;
         }
 
         .sidebar-brand .brand-title {
-            font-size: 1rem;
-            font-weight: 850;
+            margin: 0;
+            font-size: 1.05rem;
+            line-height: 1.1;
+            font-weight: 900;
             color: #101b3d;
         }
 
         .sidebar-brand .brand-subtitle {
-            color: #52617a;
-            font-size: 0.84rem;
+            margin: 0.22rem 0 0 0;
+            color: #5f6e87;
+            font-size: 0.82rem;
+            line-height: 1.25;
+            font-weight: 650;
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] {
@@ -715,193 +747,162 @@ def inject_css() -> None:
         [data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] {
             display: flex;
             flex-direction: column;
-            gap: 0.55rem;
+            gap: 0.38rem;
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label {
             position: relative;
             justify-content: flex-start;
-            min-height: 46px;
-            border-radius: 8px;
-            padding: 0.62rem 0.82rem 0.62rem 3.15rem;
+            align-items: center;
+            min-height: 48px;
+            border-radius: 12px;
+            padding: 0.68rem 0.84rem 0.68rem 3.24rem;
             background: transparent;
             border: 1px solid transparent;
+            transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child,
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label span:first-child {
+            display: none !important;
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label::before {
             content: "";
             position: absolute;
-            left: 0.62rem;
+            left: 0.72rem;
             top: 50%;
             transform: translateY(-50%);
-            width: 31px;
-            height: 31px;
-            border-radius: 8px;
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
             display: grid;
             place-items: center;
-            color: #66748f;
-            background: transparent;
+            color: #71819b;
+            background: rgba(255, 255, 255, 0.74);
+            border: 1px solid rgba(226, 232, 240, 0.92);
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 0.92rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
         }
 
-        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(1)::before { content: "⌂"; }
-        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(2)::before { content: "◨"; }
-        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(3)::before { content: "▣"; }
-        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(4)::before { content: "●"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(1)::before { content: "H"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(2)::before { content: "D"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(3)::before { content: "M"; }
+        [data-testid="stSidebar"] div[data-testid="stRadio"] label:nth-of-type(4)::before { content: "P"; }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
-            background: #f7faff;
-            border-color: #eef3fb;
+            background: rgba(255, 255, 255, 0.86);
+            border-color: #e7eef8;
+            transform: translateX(2px);
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
-            background: linear-gradient(135deg, #eef6ff, #f5f9ff);
-            border-color: #edf3fb;
-            box-shadow: none;
+            background: linear-gradient(135deg, #ffffff 0%, #eef6ff 100%);
+            border-color: #dde9fb;
+            box-shadow:
+                0 14px 30px rgba(37, 99, 235, 0.11),
+                inset 3px 0 0 #2563eb;
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked)::before {
-            color: #1f64f2;
-            background: #ffffff;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-color: transparent;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.26);
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label p {
-            color: #283651;
-            font-size: 0.92rem;
-            font-weight: 760;
+            color: #2f3b52;
+            font-size: 0.91rem;
+            font-weight: 800;
             text-align: left;
+            line-height: 1.2;
         }
 
         [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p {
-            color: #1f64f2;
-            font-weight: 850;
+            color: #1d4ed8;
+            font-weight: 900;
         }
 
         .sidebar-section {
-            color: #66748f;
-            font-size: 0.82rem;
-            font-weight: 650;
-            padding: 0.95rem 0.6rem 0.45rem 0.6rem;
-            border-top: 1px solid #eef2f7;
-            margin-top: 0.85rem;
+            color: #6b7890;
+            font-size: 0.74rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 1.15rem 0.72rem 0.54rem 0.72rem;
+            border-top: 1px solid rgba(226, 232, 240, 0.95);
+            margin-top: 1.15rem;
         }
 
         [data-testid="stSidebar"] [data-testid="stFileUploader"] {
-            background: transparent;
-            border: 0;
-            padding: 0;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid #e6edf7;
+            border-radius: 14px;
+            padding: 0.72rem;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.045);
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] label p {
+            color: #36445f !important;
+            font-size: 0.84rem;
+            font-weight: 800;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] small {
+            display: none !important;
         }
 
         [data-testid="stSidebar"] [data-testid="stFileUploader"] section {
-            border: 1px dashed #d8e2ef;
-            border-radius: 8px;
-            background: #f8fbff;
-            padding: 0.65rem;
-        }
-
-        .sidebar-about {
-            margin-top: 42vh;
-            border: 1px solid #e5ebf3;
-            border-radius: 8px;
-            color: #3d4a62;
-            padding: 0.82rem 0.95rem;
-            background: #ffffff;
-            font-size: 0.9rem;
-            font-weight: 650;
-        }
-
-        .app-shell-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.45rem;
-        }
-
-        .welcome-kicker {
-            color: #465675;
-            font-size: 0.93rem;
-            margin-bottom: 0.18rem;
-        }
-
-        .welcome-title {
-            margin: 0;
-            color: #101b3d;
-            font-size: 1.55rem;
-            line-height: 1.1;
-            font-weight: 900;
-        }
-
-        .welcome-subtitle {
-            margin: 0.45rem 0 0 0;
-            color: #5b6a84;
-            font-size: 0.96rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .target-card {
-            display: flex;
-            align-items: center;
-            gap: 0.78rem;
-            min-width: 260px;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid #e4eaf3;
-            border-radius: 8px;
-            padding: 0.72rem 0.95rem;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-        }
-
-        .target-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            border: 1px dashed #cbd8ea;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #f8fbff, #ffffff);
+            padding: 0.72rem;
+            min-height: 76px;
             display: grid;
             place-items: center;
-            font-size: 1.5rem;
-            background: #fff2f2;
+            overflow: hidden;
         }
 
-        .target-label,
-        .user-label {
-            color: #6a7891;
-            font-size: 0.8rem;
-            font-weight: 650;
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneInstructions"],
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] section > div:first-child {
+            display: none !important;
         }
 
-        .target-name {
-            color: #111b3b;
-            font-size: 0.9rem;
-            font-weight: 850;
-            margin-top: 0.15rem;
-        }
-
-        .user-menu {
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] button {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
-            gap: 0.62rem;
-            color: #1f2c45;
-            font-weight: 780;
+            justify-content: center;
+            border-radius: 10px;
+            background: #111827;
+            border: 1px solid #111827;
+            color: transparent !important;
+            font-size: 0 !important;
+            font-weight: 800;
+            box-shadow: 0 10px 20px rgba(17, 24, 39, 0.16);
+            min-height: 42px;
+            padding: 0.58rem 0.72rem;
+            position: relative;
             white-space: nowrap;
         }
 
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] button::after {
+            content: "Choisir un CSV";
             color: #ffffff;
-            display: grid;
-            place-items: center;
-            background: linear-gradient(135deg, #3b82f6, #14b8a6);
-            font-weight: 900;
+            font-size: 0.82rem;
+            line-height: 1;
+            font-weight: 850;
+            letter-spacing: 0;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stFileUploader"] button:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
         }
 
         .home-hero {
@@ -1056,8 +1057,8 @@ def inject_css() -> None:
 
         .home-lower-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.36fr) minmax(360px, 0.96fr);
-            gap: 1.55rem;
+            grid-template-columns: 1fr;
+            gap: 1.45rem;
             align-items: start;
         }
 
@@ -1072,15 +1073,15 @@ def inject_css() -> None:
         .business-cards {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .business-card {
-            min-height: 151px;
+            min-height: 164px;
             background: #ffffff;
             border: 1px solid #e3e9f2;
             border-radius: 8px;
-            padding: 1rem 1.05rem;
+            padding: 1.05rem 1.1rem;
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045);
         }
 
@@ -1109,7 +1110,7 @@ def inject_css() -> None:
 
         .business-title {
             color: #17213c;
-            font-size: 0.86rem;
+            font-size: 0.94rem;
             font-weight: 850;
         }
 
@@ -1117,73 +1118,71 @@ def inject_css() -> None:
         .capability-card p {
             margin: 0;
             color: #33415e;
-            font-size: 0.75rem;
+            font-size: 0.82rem;
             line-height: 1.55;
-        }
-
-        .question-card {
-            display: grid;
-            grid-template-columns: 56px minmax(0, 1fr);
-            gap: 1rem;
-            align-items: center;
-            color: #111b3b;
-            background:
-                linear-gradient(#ffffff, #ffffff) padding-box,
-                linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(20, 184, 166, 0.55)) border-box;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 1rem 1.15rem;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.045);
-            margin: 1.05rem 0 0 0;
-        }
-
-        .question-badge {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-            color: #ffffff;
-            background: linear-gradient(135deg, #6d5dfc, #6b3dd8);
-            box-shadow: 0 12px 22px rgba(109, 93, 252, 0.28);
-            font-size: 1.35rem;
-            font-weight: 900;
-        }
-
-        .question-text {
-            color: #111b3b;
-            font-size: 1rem;
-            line-height: 1.45;
-            font-weight: 850;
         }
 
         .capability-cards {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.9rem;
+            gap: 1rem;
         }
 
         .capability-card {
-            min-height: 220px;
-            text-align: center;
+            min-height: 154px;
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr);
+            gap: 1rem;
+            align-items: start;
+            text-align: left;
             background: #ffffff;
             border: 1px solid #e3e9f2;
             border-radius: 8px;
-            padding: 1.25rem 1rem 1rem 1rem;
+            padding: 1.15rem;
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045);
         }
 
-        .capability-card .home-icon {
+        .capability-card .home-icon,
+        .capability-logo {
+            width: 62px;
+            height: 62px;
             color: #ffffff;
-            margin: 0 auto 1.05rem auto;
-            border-radius: 8px;
+            margin: 0;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+        }
+
+        .capability-logo {
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e6edf5;
+        }
+
+        .capability-logo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .capability-card .home-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .capability-copy {
+            min-width: 0;
         }
 
         .capability-title {
             color: #111b3b;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            line-height: 1.25;
             font-weight: 900;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.42rem;
         }
 
         .footer {
@@ -1194,6 +1193,13 @@ def inject_css() -> None:
         }
 
         @media (max-width: 1180px) {
+            .metric-grid .metric-card,
+            .metric-grid .metric-card:nth-child(5),
+            .metric-grid .metric-card:nth-child(6),
+            .metric-grid .metric-card:nth-child(7) {
+                grid-column: span 6;
+            }
+
             .home-kpi-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -1206,16 +1212,6 @@ def inject_css() -> None:
         @media (max-width: 900px) {
             .block-container {
                 padding: 1rem 1.1rem 2rem 1.1rem;
-            }
-
-            .app-shell-header {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .header-actions {
-                justify-content: flex-start;
-                width: 100%;
             }
 
             .home-hero {
@@ -1234,9 +1230,13 @@ def inject_css() -> None:
                 grid-template-columns: 1fr;
             }
 
-            .sidebar-about {
-                margin-top: 2rem;
+            .metric-grid .metric-card,
+            .metric-grid .metric-card:nth-child(5),
+            .metric-grid .metric-card:nth-child(6),
+            .metric-grid .metric-card:nth-child(7) {
+                grid-column: span 12;
             }
+
         }
         </style>
         """,
@@ -1284,15 +1284,34 @@ def apply_plot_style(fig: go.Figure, height: int = 380) -> go.Figure:
     return fig
 
 
-def render_metric_card(label: str, value: str, hint: str) -> None:
-    """Render a compact KPI card."""
+def metric_card_html(label: str, value: str, hint: str) -> str:
+    """Build a compact KPI card."""
 
-    st.markdown(
-        f"""
+    return f"""
         <div class="metric-card">
             <div class="label">{label}</div>
             <div class="value">{value}</div>
             <div class="hint">{hint}</div>
+        </div>
+    """
+
+
+def render_metric_card(label: str, value: str, hint: str) -> None:
+    """Render a compact KPI card."""
+
+    st.markdown(
+        metric_card_html(label, value, hint),
+        unsafe_allow_html=True,
+    )
+
+
+def render_metric_grid(cards: list[tuple[str, str, str]]) -> None:
+    """Render dashboard metrics in a balanced responsive grid."""
+
+    st.markdown(
+        f"""
+        <div class="metric-grid">
+            {"".join(metric_card_html(label, value, hint) for label, value, hint in cards)}
         </div>
         """,
         unsafe_allow_html=True,
@@ -1437,7 +1456,7 @@ def home_icon(name: str) -> str:
 
     icons = {
         "users": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
@@ -1445,32 +1464,32 @@ def home_icon(name: str) -> str:
             </svg>
         """,
         "user": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
             </svg>
         """,
         "bolt": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/>
             </svg>
         """,
         "home": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m3 11 9-8 9 8"/>
                 <path d="M5 10v11h14V10"/>
                 <path d="M9 21v-7h6v7"/>
             </svg>
         """,
         "database": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <ellipse cx="12" cy="5" rx="8" ry="3"/>
                 <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>
                 <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
             </svg>
         """,
         "chart": """
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19V5"/>
                 <path d="M4 19h16"/>
                 <rect x="7" y="11" width="3" height="5" rx="1"/>
@@ -1495,6 +1514,19 @@ def home_metric_card(icon: str, tone: str, label: str, value: str, hint: str) ->
             </div>
         </div>
     """
+
+
+def capability_logo(image_path: Path, alt: str, fallback_icon: str, fallback_tone: str) -> str:
+    """Build the image mark used in home-page capability cards."""
+
+    image_uri = image_to_data_uri(image_path)
+    if image_uri:
+        return f"""
+            <div class="capability-logo">
+                <img src="{image_uri}" alt="{html.escape(alt)}">
+            </div>
+        """
+    return f'<div class="home-icon {fallback_tone}">{home_icon(fallback_icon)}</div>'
 
 
 @st.cache_data(show_spinner=False)
@@ -1563,9 +1595,6 @@ def prepare_features(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError(f"Types de chauffage non supportes : {invalid}")
     prepared["temperature_x_ac"] = (
         prepared["Avg_Temperature_C"] * prepared["Has_AC_Binary"]
-    )
-    prepared["household_size_x_ac"] = (
-        prepared["Household_Size"] * prepared["Has_AC_Binary"]
     )
     for heating_type, feature_name in HEATING_TYPE_FEATURES.items():
         prepared[feature_name] = prepared["heating_type"].eq(heating_type).astype(int)
@@ -1661,6 +1690,24 @@ def render_home(df: pd.DataFrame, prepared_df: pd.DataFrame) -> None:
         if hero_image_uri
         else ""
     )
+    database_logo = capability_logo(
+        LOGO_DATABASE_PATH,
+        "Logo exploration des donnees",
+        "database",
+        "tone-teal",
+    )
+    model_logo = capability_logo(
+        LOGO_MODEL_PATH,
+        "Logo comparaison des modeles",
+        "chart",
+        "tone-violet",
+    )
+    prediction_logo = capability_logo(
+        LOGO_PREDICTION_PATH,
+        "Logo prediction",
+        "bolt",
+        "tone-rose",
+    )
     kpi_cards = "\n".join(
         [
             home_metric_card(
@@ -1751,32 +1798,31 @@ def render_home(df: pd.DataFrame, prepared_df: pd.DataFrame) -> None:
                         </p>
                     </article>
                 </div>
-                <div class="question-card">
-                    <div class="question-badge">?</div>
-                    <div class="question-text">
-                        Peut-on prédire la consommation énergétique d'un foyer à partir de ses
-                        caractéristiques et de ses habitudes de consommation ?
-                    </div>
-                </div>
             </section>
 
             <section>
                 <h2 class="home-section-title">Ce que permet l'application</h2>
                 <div class="capability-cards">
                     <article class="capability-card">
-                        <div class="home-icon tone-teal">{home_icon("database")}</div>
-                        <div class="capability-title">Explorer les données</div>
-                        <p>Comprendre la structure du dataset et les profils de consommation.</p>
+                        {database_logo}
+                        <div class="capability-copy">
+                            <div class="capability-title">Explorer les données</div>
+                            <p>Comprendre la structure du dataset et les profils de consommation.</p>
+                        </div>
                     </article>
                     <article class="capability-card">
-                        <div class="home-icon tone-violet">{home_icon("chart")}</div>
-                        <div class="capability-title">Comparer les modèles</div>
-                        <p>Évaluer les performances d'une régression linéaire et d'un Random Forest.</p>
+                        {model_logo}
+                        <div class="capability-copy">
+                            <div class="capability-title">Comparer les modèles</div>
+                            <p>Évaluer les performances d'une régression linéaire et d'un Random Forest.</p>
+                        </div>
                     </article>
                     <article class="capability-card">
-                        <div class="home-icon tone-rose">{home_icon("bolt")}</div>
-                        <div class="capability-title">Faire une prédiction</div>
-                        <p>Estimer la consommation énergétique d'un foyer à partir de ses caractéristiques.</p>
+                        {prediction_logo}
+                        <div class="capability-copy">
+                            <div class="capability-title">Faire une prédiction</div>
+                            <p>Estimer la consommation énergétique d'un foyer à partir de ses caractéristiques.</p>
+                        </div>
                     </article>
                 </div>
             </section>
@@ -1804,51 +1850,45 @@ def render_data_page(df: pd.DataFrame, prepared_df: pd.DataFrame, uploaded_file:
         unsafe_allow_html=True,
     )
 
-    col_a, col_b, col_c, col_d = st.columns(4)
-    with col_a:
-        render_metric_card(
-            "Lignes",
-            format_number(float(len(df))),
-            "Nombre total d'observations disponibles.",
-        )
-    with col_b:
-        render_metric_card(
-            "Colonnes",
-            format_number(float(df.shape[1])),
-            "Variables présentes dans le dataset.",
-        )
-    with col_c:
-        render_metric_card(
-            "Valeurs manquantes",
-            format_number(float(df.isna().sum().sum())),
-            "Contrôle du niveau de complétude.",
-        )
-    with col_d:
-        render_metric_card(
-            "Doublons",
-            format_number(float(df.duplicated().sum())),
-            "Détection des lignes répétées.",
-        )
-
-    col_surface, col_presence, col_heating = st.columns(3)
-    with col_surface:
-        render_metric_card(
-            "Surface moyenne",
-            f"{prepared_df['surface_m2'].mean():.1f} m2",
-            "Surface générée à partir de la taille du foyer et du profil logement.",
-        )
-    with col_presence:
-        render_metric_card(
-            "Temps à domicile",
-            f"{prepared_df['hours_at_home'].mean():.1f} h",
-            "Présence quotidienne moyenne générée pour le foyer.",
-        )
-    with col_heating:
-        render_metric_card(
-            "Chauffage principal",
-            str(prepared_df["heating_type"].mode().iloc[0]),
-            "Type de chauffage le plus fréquent dans le dataset enrichi.",
-        )
+    render_metric_grid(
+        [
+            (
+                "Lignes",
+                format_number(float(len(df))),
+                "Nombre total d'observations disponibles.",
+            ),
+            (
+                "Colonnes",
+                format_number(float(df.shape[1])),
+                "Variables présentes dans le dataset.",
+            ),
+            (
+                "Valeurs manquantes",
+                format_number(float(df.isna().sum().sum())),
+                "Contrôle du niveau de complétude.",
+            ),
+            (
+                "Doublons",
+                format_number(float(df.duplicated().sum())),
+                "Détection des lignes répétées.",
+            ),
+            (
+                "Surface moyenne",
+                f"{prepared_df['surface_m2'].mean():.1f} m&sup2;",
+                "Surface générée à partir de la taille du foyer et du profil logement.",
+            ),
+            (
+                "Temps à domicile",
+                f"{prepared_df['hours_at_home'].mean():.1f} h",
+                "Présence quotidienne moyenne générée pour le foyer.",
+            ),
+            (
+                "Chauffage principal",
+                str(prepared_df["heating_type"].mode().iloc[0]),
+                "Type de chauffage le plus fréquent dans le dataset enrichi.",
+            ),
+        ]
+    )
 
     st.markdown(
         """
@@ -2106,7 +2146,6 @@ def make_prediction_row(
                 "surface_m2": surface_m2,
                 "hours_at_home": hours_at_home,
                 "temperature_x_ac": avg_temperature * has_ac_binary,
-                "household_size_x_ac": household_size * has_ac_binary,
                 **heating_features,
             }
         ],
@@ -2221,6 +2260,15 @@ def render_prediction_page(prepared_df: pd.DataFrame) -> None:
     model = st.session_state["training_result"]["model"]
     prediction = float(model.predict(input_row)[0])
     dataset_mean = float(prepared_df[TARGET_COLUMN].mean())
+    displayed_input_row = input_row.copy()
+    displayed_input_row.insert(
+        displayed_input_row.columns.get_loc("hours_at_home"),
+        "heating_type",
+        heating_type,
+    )
+    displayed_input_row = displayed_input_row.drop(
+        columns=list(HEATING_TYPE_FEATURES.values())
+    )
 
     col_result, col_features = st.columns([0.9, 1.1])
     with col_result:
@@ -2228,7 +2276,7 @@ def render_prediction_page(prepared_df: pd.DataFrame) -> None:
         render_prediction_gauge(prediction, prepared_df)
     with col_features:
         st.subheader("Variables envoyées au modèle")
-        st.dataframe(input_row, use_container_width=True, hide_index=True)
+        st.dataframe(displayed_input_row, use_container_width=True, hide_index=True)
         if prediction > dataset_mean * 1.15:
             message = "Ce foyer se situe au-dessus de la moyenne du dataset."
             color = "rose"
@@ -2287,39 +2335,6 @@ def render_top_navigation() -> tuple[str, Any | None]:
     uploaded_file = st.sidebar.file_uploader(
         "Importer un CSV",
         type=["csv"],
-        help="Sans import, l'application utilise automatiquement le dataset du projet.",
-    )
-    st.sidebar.markdown(
-        '<div class="sidebar-about">? &nbsp; À propos du projet</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-        <div class="app-shell-header">
-            <div>
-                <div class="welcome-kicker">Bonjour ! &#128075;</div>
-                <h1 class="welcome-title">Bienvenue sur Energy ML</h1>
-                <p class="welcome-subtitle">
-                    Prédisez la consommation énergétique des foyers grâce au Machine Learning.
-                </p>
-            </div>
-            <div class="header-actions">
-                <div class="target-card">
-                    <div class="target-icon">&#127919;</div>
-                    <div>
-                        <div class="target-label">Cible actuelle</div>
-                        <div class="target-name">Energy_Consumption_kWh</div>
-                    </div>
-                </div>
-                <div class="user-menu">
-                    <div class="user-avatar">U</div>
-                    <div>Utilisateur⌄</div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
     )
 
     return page, uploaded_file
@@ -2358,7 +2373,8 @@ def build_app() -> None:
     elif page == "Prédiction":
         render_prediction_page(prepared_df)
 
-    render_footer()
+    if page != "Accueil":
+        render_footer()
 
 
 if __name__ == "__main__":

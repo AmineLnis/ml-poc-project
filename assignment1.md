@@ -29,7 +29,6 @@ Le projet suit les étapes suivantes :
    - transformation de `Has_AC` en variable numérique avec `Has_AC_Binary`
    - encodage de `heating_type` en variables indicatrices
    - création de variables d’interaction comme `temperature_x_ac`
-   - création de variables d’interaction comme `household_size_x_ac`
 
 4. Construction d’un modèle de régression supervisée pour prédire la variable cible :
 

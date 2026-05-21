@@ -52,19 +52,22 @@ python scripts/generate_household_features.py
 When you run:
 
 ```bash
-python scripts/main.py
+py scripts/main.py
 ```
 
-the template will do the following:
+the template launches the Streamlit app on `localhost`.
 
-1. read the list of trained models from `src/config.py`,
-2. call your dataset loading function from `src/data.py`,
-3. load each serialized model from `models/`,
-4. run predictions on the test split,
-5. call your metric computation function from `src/metrics.py`,
-6. save the results to `results/model_metrics.csv`,
-7. print the metrics in the terminal,
-8. launch the Streamlit app on `localhost`.
+To evaluate the configured models before launching the app, run:
+
+```bash
+python scripts/main.py --evaluate
+```
+
+To evaluate models without launching the app, run:
+
+```bash
+python scripts/main.py --no-app
+```
 
 ## What You Must Update
 
@@ -216,7 +219,7 @@ This is used when `scripts/main.py` launches Streamlit so modules inside `src/` 
 10. Run the full project:
 
 ```bash
-python scripts/main.py
+py scripts/main.py
 ```
 
 ## Output Produced by the Template
@@ -299,5 +302,5 @@ data/household_energy_consumption_enriched.csv
 After these files are available, run the full workflow with:
 
 ```bash
-python scripts/main.py
+python scripts/main.py --evaluate
 ```
